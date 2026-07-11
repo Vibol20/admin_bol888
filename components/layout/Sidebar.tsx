@@ -31,7 +31,7 @@ export default function Sidebar() {
     <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-black/5 bg-white/70 backdrop-blur-xl dark:border-white/5 dark:bg-pitch-950/70 md:flex">
       <div className="flex items-center gap-2 px-6 py-6">
         <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-floodlight-500/20 text-floodlight-500">
-          <span className="font-display text-lg">⚽</span>
+          <span className="font-display text-lg"></span>
         </div>
         <span className="font-display text-lg tracking-wide">{APP_NAME}</span>
       </div>
