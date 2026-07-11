@@ -1,0 +1,140 @@
+# ⚽ Football AI Hub
+
+A production-quality, full-stack AI football web app — news, an AI chat assistant, AI match analysis, and an educational betting helper — built with **Next.js 15 (App Router)**, **TypeScript**, **Tailwind CSS**, the **Vercel AI SDK**, and **Google Gemini**.
+
+No MySQL. No PHP. No Firebase. No Supabase. No MongoDB. All user data (settings, favorites, chat history) lives entirely in the browser via **localStorage** and **IndexedDB**.
+
+---
+
+## ✨ Features
+
+- **Home** — hero with live clock, today's fixtures, top leagues, trending news, featured predictions, AI assistant promo, popular teams
+- **AI Football Chat** — streaming, markdown-formatted, ChatGPT-style chat with conversation history (IndexedDB), export/clear, suggested prompts
+- **Football News** — AI-generated news across 9 categories, each card with image, summary, AI one-line summary, share, and bookmark
+- **AI Match Analysis** — enter two teams + competition, get win probabilities, form, strengths/weaknesses, key players, correct score, Asian handicap, over/under, BTTS, risk level, confidence score, and a final verdict
+- **Betting Helper** *(educational only)* — value bets, safer picks, accumulator ideas, over/under, BTTS, double chance — each with reasoning and a mandatory responsible-gambling disclaimer
+- **Favorites** — bookmarked news, teams, and predictions, saved locally
+- **Settings** — dark/light mode, language, Gemini model selector, temperature slider, export/import/clear local data
+- **Command Palette** (`⌘K` / `Ctrl+K`) — quick search across pages, teams, and leagues
+- Glassmorphism UI, gradient floodlight backgrounds, loading skeletons, toast notifications, responsive sidebar + mobile bottom nav
+
+All Gemini calls happen **only** inside Next.js API routes (`/api/chat`, `/api/analyze`, `/api/news`, `/api/predictions`) — the API key is read from `process.env.GEMINI_API_KEY` on the server and is never sent to the browser.
+
+---
+
+## 🗂️ Project Structure
+
+```
+app/
+  api/
+    chat/route.ts          # Streaming AI chat (edge)
+    analyze/route.ts       # Structured JSON match analysis
+    news/route.ts          # AI-generated news feed
+    predictions/route.ts   # Betting helper suggestions
+  chat/ news/ analysis/ betting/ favorites/ settings/   # Pages
+  layout.tsx  globals.css  page.tsx
+components/
+  layout/   ui/   home/   chat/   news/   analysis/   betting/   settings/
+lib/        # gemini.ts, storage.ts, indexeddb.ts, utils.ts, constants.ts
+hooks/      # useLocalStorage, useTheme, useToast, useCommandPalette
+types/      # shared TypeScript types
+```
+
+---
+
+## 🚀 Getting Started (Local)
+
+**Requirements:** Node.js 18.18+ (Node 20 LTS recommended)
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Add your Gemini API key
+cp .env.example .env.local
+```
+
+Open `.env.local` and set:
+
+```env
+GEMINI_API_KEY=your_actual_gemini_api_key_here
+```
+
+Get a free key at **https://aistudio.google.com/apikey**.
+
+```bash
+# 3. Run the dev server
+npm run dev
+```
+
+Visit **http://localhost:3000**.
+
+```bash
+# Production build (locally)
+npm run build
+npm run start
+```
+
+> Note: `next/font/google` fetches font files from Google Fonts at build time, so an internet connection is required during `npm run build`.
+
+---
+
+## ☁️ Deploying to Vercel
+
+1. Push this project to a GitHub/GitLab/Bitbucket repo.
+2. Go to **https://vercel.com/new** and import the repo.
+3. Vercel auto-detects Next.js — no config changes needed.
+4. Under **Settings → Environment Variables**, add:
+   - `GEMINI_API_KEY` = your Gemini API key
+5. Click **Deploy**.
+
+That's it — the app is fully static/edge-friendly and requires no external database.
+
+### One-click alternative (Vercel CLI)
+
+```bash
+npm i -g vercel
+vercel
+vercel env add GEMINI_API_KEY
+vercel --prod
+```
+
+---
+
+## 🔐 Security Notes
+
+- `lib/gemini.ts` is a server-only module — never import it from a `"use client"` component.
+- All four AI routes (`chat`, `analyze`, `news`, `predictions`) run server-side (`export const runtime = "edge"`), so `GEMINI_API_KEY` is never exposed to the browser.
+- Model name and temperature sent from the client are sanitized/whitelisted server-side (`sanitizeModel`, `sanitizeTemperature`) before being used.
+
+---
+
+## 💾 Data Storage
+
+| Data | Storage | Notes |
+|---|---|---|
+| Theme, language, model, temperature | `localStorage` | key: `fah_settings` |
+| Favorites (news/teams/predictions) | `IndexedDB` | store: `favorites` |
+| Chat sessions & history | `IndexedDB` | store: `chatSessions` |
+| News cache (30 min TTL) | `IndexedDB` | store: `newsCache` |
+
+Everything can be exported/imported/cleared from **Settings → Local Data**.
+
+---
+
+## ⚠️ Disclaimer
+
+The **Betting Helper** and **AI Match Analysis** features are for **educational and entertainment purposes only**. They do not guarantee any outcome. Please gamble responsibly and within your means. Football news items generated by the `/api/news` route are AI-generated illustrative content for demo purposes — connect a real news/data API for production use with live data.
+
+---
+
+## 🛠️ Tech Stack
+
+- Next.js 15 (App Router, Edge runtime API routes)
+- TypeScript
+- Tailwind CSS (custom "floodlight" design system)
+- Vercel AI SDK (`ai`, `@ai-sdk/google`) — streaming + structured generation
+- Google Gemini (`gemini-1.5-flash` / `gemini-1.5-pro` / `gemini-1.5-flash-8b`)
+- `idb` for IndexedDB
+- `react-markdown` + `remark-gfm` for chat rendering
+- `lucide-react` icons
